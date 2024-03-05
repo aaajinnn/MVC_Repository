@@ -18,4 +18,19 @@
   	</jsp-property-group>
   </jsp-config>
   <!--=========================================== -->
+  
+  <!-- Prevent JSP(jsp에 직접 접근 금지========== -->
+  <security-constraint>
+  	<web-resource-collection>
+  		<web-resource-name>Prevent JSP</web-resource-name>
+  		<description>Prevent JSP</description>
+  		<url-pattern>*.jsp</url-pattern>
+  		<http-method>GET</http-method>
+  		<http-method>POST</http-method>
+  	</web-resource-collection>
+  	<auth-constraint>
+  		<role-name></role-name>
+  	</auth-constraint>
+  </security-constraint>
+  <!-- ========================================== -->
 </web-app>

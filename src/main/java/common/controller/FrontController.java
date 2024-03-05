@@ -57,7 +57,7 @@ public class FrontController extends HttpServlet {
 					System.out.println(cmd + " : " + className);
 
 					// className을 실제 객체로 인스턴스화
-					Class<?> cls = Class.forName(className);
+					Class<?> cls = Class.forName(className); // 문자열 오브젝트화
 					Object cmdInstance = cls.getDeclaredConstructor().newInstance();
 					// 해당 클래스의 객체를 생성해줌
 
@@ -104,7 +104,7 @@ public class FrontController extends HttpServlet {
 
 		///////////////////////////
 		if (instance instanceof AbstractAction) {
-			action = (AbstractAction) instance;
+			action = (AbstractAction) instance; // 자식유형으로 형변환을 해야만 execute를 부를 수 있다.
 		}
 		///////////////////////////
 		try {

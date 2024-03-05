@@ -63,3 +63,9 @@ input,select,textarea,iframe,button{
 .m2{
 	background-color: #cc8800;
 }
+
+/* 현재 페이지 일때 페이지번호 */
+.active{
+	color:red;
+	font-weight:bold;
+}

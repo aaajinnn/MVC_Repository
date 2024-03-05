@@ -19,15 +19,12 @@
 			<ul class="topMenu">
 				<!-- 어디서 include 될지 모르기때문에 컨텍스트명을 기준으로 절대경로 설정 -->
 				<li><a href="<%=ctx %>/index.do">Home</a></li> 
-				
 				<li><a href="<%=ctx%>/login/login.do">로그인</a></li>
-				
 				<li><a href="#">a님 로그인 중...</a></li>
 				<li><a href="<%=ctx%>/login/logout.do">로그아웃</a></li>
-				
 				<li><a href="<%=ctx %>/member/join.do">회원가입</a></li>
 				<li><a href="<%=ctx %>/board/input.do">게시판 글쓰기</a></li>
-				<li><a href="<%=ctx %>/board/list2.do">게시판 글목록</a></li>
+				<li><a href="<%=ctx %>/board/list.do">게시판 글목록</a></li>
 				<li><a href="<%=ctx %>/login/mypage.do">MyPage</a></li>
 			</ul>
 		</header>
