@@ -77,11 +77,9 @@ public class BoardDAO {
 		try {
 			con = ds.getConnection();
 			// String sql = "SELECT * FROM mvc_board ORDER BY num DESC"; // paging처리 안할 때
+			// paging처리 할 때
 			StringBuffer buf = new StringBuffer("select * from(").append(" select rownum rn, a.*")
-					.append(" from (select * from mvc_board order by num desc) a)").append(" where rn between ? and ?"); // paging처리
-																															// 할
-																															// 때
-
+					.append(" from (select * from mvc_board order by num desc) a)").append(" where rn between ? and ?");
 			String sql = buf.toString();
 
 			ps = con.prepareStatement(sql);
@@ -95,24 +93,6 @@ public class BoardDAO {
 			close();
 		}
 	}// ---------------------------
-
-	/** 게시글보기 */
-	public List<BoardVO> getBoard(int num) throws SQLException {
-		try {
-			con = ds.getConnection();
-
-			String sql = "SELECT * FROM mvc_board WHERE num=?";
-			ps = con.prepareStatement(sql);
-			ps.setInt(1, num);
-
-			rs = ps.executeQuery();
-
-			return makeList(rs);
-
-		} finally {
-			close();
-		}
-	}
 
 	public List<BoardVO> makeList(ResultSet rs) throws SQLException {
 		List<BoardVO> arr = new ArrayList<>();
@@ -130,6 +110,154 @@ public class BoardDAO {
 			arr.add(record);
 		}
 		return arr;
+	}
+
+	/** 글번호(PK)로 글 내용 보기 */
+	public BoardVO getBoard(int num) throws SQLException {
+		try {
+			con = ds.getConnection();
+
+			String sql = "SELECT * FROM mvc_board WHERE num=?";
+			ps = con.prepareStatement(sql);
+			ps.setInt(1, num);
+
+			rs = ps.executeQuery();
+
+			List<BoardVO> arr = makeList(rs);
+			if (arr == null || arr.size() == 0) {
+				return null;
+			}
+			BoardVO vo = arr.get(0);
+			return vo;
+
+		} finally {
+			close();
+		}
+	}// -----------------------------
+
+	/** 조회수 증가 */
+	public void updateReadNum(int num) throws SQLException {
+		try {
+			con = ds.getConnection();
+			StringBuffer buf = new StringBuffer("UPDATE mvc_board SET ").append(" readnum = readnum+1 WHERE num=?");
+			String sql = buf.toString();
+			ps = con.prepareStatement(sql);
+			ps.setInt(1, num);
+			ps.executeUpdate(); // void는 return(반환값) 필요없음
+		} finally {
+			close();
+		}
+
+	}// -----------------------------
+
+	/** 글삭제 */
+	public int deleteBoard(int num) throws SQLException {
+		try {
+			con = ds.getConnection();
+			String sql = "DELETE FROM mvc_board WHERE num=?";
+			ps = con.prepareStatement(sql);
+			ps.setInt(1, num);
+
+			return ps.executeUpdate();
+		} finally {
+			close();
+		}
+	}// -----------------------------
+
+	/** 글수정 */
+	public int updateBoard(BoardVO vo) throws SQLException {
+		try {
+			con = ds.getConnection();
+			StringBuffer buf = new StringBuffer("UPDATE mvc_board SET name=?, passwd=?,")
+					.append(" title=?, content=? ");
+			if (vo.getFileName() != null) { // 첨부파일이 있다면
+				buf.append(" ,fileName=?, fileSize=? ");
+			}
+			buf.append(" WHERE num=?");
+			String sql = buf.toString();
+			System.out.println(sql);
+			ps = con.prepareStatement(sql);
+			ps.setString(1, vo.getName());
+			ps.setString(2, vo.getPasswd());
+			ps.setString(3, vo.getTitle());
+			ps.setString(4, vo.getContent());
+			if (vo.getFileName() != null) {
+				ps.setString(5, vo.getFileName());
+				ps.setLong(6, vo.getFileSize());
+				ps.setInt(7, vo.getNum());
+			} else {
+				ps.setInt(5, vo.getNum());
+			}
+
+			return ps.executeUpdate();
+		} finally {
+			close();
+		}
+
+	}// -----------------------------
+
+	/** 키워드로 검색하기 */
+	public int getFindTotalCount(int findType, String findKeyword) throws SQLException {
+		try {
+			con = ds.getConnection();
+			StringBuffer buf = new StringBuffer("SELECT count(*) FROM mvc_board WHERE ");
+
+			if (findType == 1) {
+				buf.append("title");
+			} else if (findType == 2) {
+				buf.append("name");
+			} else if (findType == 3) {
+				buf.append("content");
+			}
+			buf.append(" LIKE ?");
+
+			String sql = buf.toString();
+			System.out.println(sql);
+
+			ps = con.prepareStatement(sql);
+
+			ps.setString(1, "%" + findKeyword + "%");
+			rs = ps.executeQuery();
+
+			if (rs.next()) {
+				return rs.getInt(1);
+			} else {
+				return 0;
+			}
+
+		} finally {
+			close();
+		}
+	}
+
+	/** 검색결과 가져오기 */
+	public List<BoardVO> findBoard(int start, int end, int findType, String findKeyword) throws SQLException {
+		try {
+			con = ds.getConnection();
+			StringBuffer buf = new StringBuffer("SELECT * FROM (").append(" SELECT rownum rn, a.*")
+					.append(" FROM (SELECT * FROM mvc_board ORDER BY num DESC) a WHERE ");
+			if (findType == 1) {
+				buf.append(" title");
+			} else if (findType == 2) {
+				buf.append(" name");
+			} else if (findType == 3) {
+				buf.append(" content");
+			}
+			buf.append(" LIKE ?)");
+			buf.append(" WHERE rn BETWEEN ? AND ?");
+			String sql = buf.toString();
+			System.out.println(sql);
+			ps = con.prepareStatement(sql);
+			ps.setString(1, "%" + findKeyword + "%");
+			ps.setInt(2, start);
+			ps.setInt(3, end);
+
+			rs = ps.executeQuery();
+
+			return makeList(rs);
+		} finally {
+			close();
+		}
 	}
 
 	public void close() {

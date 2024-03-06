@@ -1,7 +1,5 @@
 package board.controller;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -15,17 +13,28 @@ public class BoardViewAction extends AbstractAction {
 	public void execute(HttpServletRequest req, HttpServletResponse res) throws Exception {
 
 		String numStr = req.getParameter("num");
-		int num = Integer.parseInt(numStr); // 글번호
+		if (numStr == null) {
+			this.setRedirect(true); // redirect방식으로 이동
+			this.setViewName("list.do"); // jps를 막아두었기때문에 XXX.do로 이동하여야함
+			return;
+		}
+
+		int num = Integer.parseInt(numStr.trim()); // 글번호
 
 		BoardDAO dao = new BoardDAO();
 
-		List<BoardVO> boardView = dao.getBoard(num);
+		// 1. 조회수 증가
+		dao.updateReadNum(num);
 
-		req.setAttribute("boardView", boardView);
+		// 2. 해당 글 가져오기
+
+		BoardVO vo = dao.getBoard(num);
+
+		req.setAttribute("vo", vo);
 
 		this.setViewName("/board/view.jsp");
 		this.setRedirect(false);
-//		System.out.println(num);
+
 	}
 
 }

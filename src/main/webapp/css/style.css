@@ -69,3 +69,7 @@ input,select,textarea,iframe,button{
 	color:red;
 	font-weight:bold;
 }
+
+.text-center{
+	text-align:center;
+}

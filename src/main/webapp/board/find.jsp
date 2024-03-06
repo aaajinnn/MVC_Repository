@@ -9,8 +9,10 @@
 	 
 		<!-- content -->
 		<div class="container">
-			<h1>MVC Board</h1>
+		<c:if test="${boardAll ne null && not empty findKeyword}">
+			<h1>MVC Board - [검색어 : ${findKeyword }]</h1>
 			<br>
+		</c:if>
 			[<a href="input.do">글쓰기</a>]
 			<br><br>
 			<table border="1">
@@ -56,9 +58,11 @@
 				<tr>
 					<td colspan="3" style="text-align:center">
 					<!-- 페이지 네비게이션 -->
-					<c:forEach var="i" begin="1" end="${pageCount }" step="1"><!-- step : 디폴트 1 -->
-						[<a href="list.do?pageNum=${i}"   <c:if test="${pageNum == i }">class='active'</c:if>     > ${i} </a>]
-					</c:forEach>
+					<c:if test="${boardAll != null && not empty boardAll }">
+						<c:forEach var="i" begin="1" end="${pageCount }" step="1"><!-- step : 디폴트 1 -->
+							[<a href="find.do?pageNum=${i} & findType=a & findKeyword=b"   <c:if test="${pageNum == i }">class='active'</c:if>     > ${i} </a>]
+						</c:forEach>
+					</c:if>
 					</td>
 					<td colspan="2" style="text-align:center">
 						총 게시글 수
