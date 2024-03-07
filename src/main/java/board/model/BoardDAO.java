@@ -197,33 +197,35 @@ public class BoardDAO {
 	}// -----------------------------
 
 	/** 키워드로 검색하기 */
-	public int getFindTotalCount(int findType, String findKeyword) throws SQLException {
+	public int getFindTotalCount(int ftType, String findKeyword) throws SQLException {
 		try {
 			con = ds.getConnection();
-			StringBuffer buf = new StringBuffer("SELECT count(*) FROM mvc_board WHERE ");
+			StringBuffer buf = new StringBuffer("SELECT count(num) FROM mvc_board WHERE ");
 
-			if (findType == 1) {
-				buf.append("title");
-			} else if (findType == 2) {
-				buf.append("name");
-			} else if (findType == 3) {
-				buf.append("content");
+			if (ftType == 1) {
+				buf.append("title LIKE ? ");
+			} else if (ftType == 2) {
+				buf.append("name LIKE ? ");
+			} else if (ftType == 3) {
+				buf.append("content LIKE ? ");
+			} else {
+				buf.append(" 1=0 ");
 			}
-			buf.append(" LIKE ?");
 
 			String sql = buf.toString();
 			System.out.println(sql);
 
 			ps = con.prepareStatement(sql);
-
-			ps.setString(1, "%" + findKeyword + "%");
+			if (ftType > 0 && ftType < 4) {
+				ps.setString(1, "%" + findKeyword + "%");
+			}
 			rs = ps.executeQuery();
 
 			if (rs.next()) {
-				return rs.getInt(1);
-			} else {
-				return 0;
+				int cnt = rs.getInt(1);
+				return cnt;
 			}
+			return 0;
 
 		} finally {
 			close();
@@ -231,19 +233,22 @@ public class BoardDAO {
 	}
 
 	/** 검색결과 가져오기 */
-	public List<BoardVO> findBoard(int start, int end, int findType, String findKeyword) throws SQLException {
+	public List<BoardVO> findBoard(int start, int end, int ftType, String findKeyword) throws SQLException {
 		try {
 			con = ds.getConnection();
-			StringBuffer buf = new StringBuffer("SELECT * FROM (").append(" SELECT rownum rn, a.*")
-					.append(" FROM (SELECT * FROM mvc_board ORDER BY num DESC) a WHERE ");
-			if (findType == 1) {
-				buf.append(" title");
-			} else if (findType == 2) {
-				buf.append(" name");
-			} else if (findType == 3) {
-				buf.append(" content");
+			StringBuffer buf = new StringBuffer("SELECT * FROM (")
+					.append(" SELECT rownum rn, a.* FROM ")
+					.append(" (SELECT * FROM mvc_board WHERE ");
+			if (ftType == 1) {
+				buf.append(" title LIKE ?");
+			} else if (ftType == 2) {
+				buf.append(" name LIKE ?");
+			} else if (ftType == 3) {
+				buf.append(" content LIKE ?");
+			} else {
+				buf.append(" 1=0 ");
 			}
-			buf.append(" LIKE ?)");
+			buf.append(" ORDER BY num DESC) a)");
 			buf.append(" WHERE rn BETWEEN ? AND ?");
 			String sql = buf.toString();
 			System.out.println(sql);

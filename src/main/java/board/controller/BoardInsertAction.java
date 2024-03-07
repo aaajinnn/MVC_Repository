@@ -72,7 +72,9 @@ public class BoardInsertAction extends AbstractAction {
 
 		// 4. BoardDAO생성 후 insertBoard() 호출
 		BoardDAO dao = new BoardDAO();
-		int n = dao.insertBoard(vo);
+		int n = 0;
+//		for (int i = 0; i < 12; i++)
+		n = dao.insertBoard(vo);
 
 		// 5. 그 결과 메시지, 이동경로 설정해서 req에 저장하기
 		String msg = (n > 0) ? "글 등록 완료" : "글 등록 실패";

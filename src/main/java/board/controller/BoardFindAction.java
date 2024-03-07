@@ -25,15 +25,26 @@ public class BoardFindAction extends AbstractAction {
 		}
 
 		// 검색 유형과 검색어 받기
-		String findTypeStr = req.getParameter("findType");
-		int findType = Integer.parseInt(findTypeStr);
+		String findType = req.getParameter("findType");
 		String findKeyword = req.getParameter("findKeyword");
+		if (findType == null || findType.trim().isBlank()) {
+			findType = "0";
+		}
+		int ftType = Integer.parseInt(findType.trim());
+
+		if (ftType == 0) {
+			req.setAttribute("msg", "검색유형을 선택하세요");
+			req.setAttribute("loc", "javascript:history.back()");
+			this.setViewName("/board/message.jsp");
+			this.setRedirect(false);
+			return;
+		}
 
 		// BoardDAO생성 ListBoard() 호출
 		BoardDAO dao = new BoardDAO();
 
 		// 1. 총 게시글 수 가져오기
-		int totalCount = dao.getFindTotalCount(findType, findKeyword);
+		int totalCount = dao.getFindTotalCount(ftType, findKeyword);
 
 		// 2. 한 페이지에 보여줄 목록 개수 정하기(5개)
 		int oneRecordPage = 5;
@@ -58,13 +69,14 @@ public class BoardFindAction extends AbstractAction {
 		int start = end - (oneRecordPage - 1);
 
 		// 5. 게시물 목록 가져오기
-		List<BoardVO> boardList = dao.findBoard(start, end, findType, findKeyword); // ==> findBoard()로 매개변수 전달
+		List<BoardVO> boardList = dao.findBoard(start, end, ftType, findKeyword); // ==> findBoard()로 매개변수 전달
 
 		// 반환하는 List<BoardVO> 객체를 req에 저장 ===> jsp에서 불러오기 할수있음
 		req.setAttribute("boardAll", boardList);
 		req.setAttribute("totalCount", totalCount);
 		req.setAttribute("pageCount", pageCount);
 		req.setAttribute("pageNum", pageNum);
+		req.setAttribute("ftType", ftType);
 		req.setAttribute("findKeyword", findKeyword);
 
 		this.setViewName("find.jsp");

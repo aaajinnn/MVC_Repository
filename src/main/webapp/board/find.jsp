@@ -9,10 +9,8 @@
 	 
 		<!-- content -->
 		<div class="container">
-		<c:if test="${boardAll ne null && not empty findKeyword}">
-			<h1>MVC Board - [검색어 : ${findKeyword }]</h1>
+			<h1>MVC Board - [검색어 : ${findKeyword}]</h1>
 			<br>
-		</c:if>
 			[<a href="input.do">글쓰기</a>]
 			<br><br>
 			<table border="1">
@@ -25,7 +23,7 @@
 					
 				</tr>
 				<!-- ----------------------------boardAll.size()==0 -->
-				<c:if test="${boardAll == null || empty boardAll } ">
+				<c:if test="${boardAll==null || empty boardAll} ">
 					<tr>
 						<td colspan="5">
 						<b>데이터가 없습니다.</b>
@@ -60,7 +58,7 @@
 					<!-- 페이지 네비게이션 -->
 					<c:if test="${boardAll != null && not empty boardAll }">
 						<c:forEach var="i" begin="1" end="${pageCount }" step="1"><!-- step : 디폴트 1 -->
-							[<a href="find.do?pageNum=${i} & findType=a & findKeyword=b"   <c:if test="${pageNum == i }">class='active'</c:if>     > ${i} </a>]
+							[<a href="find.do?pageNum=${i}&findType=${ftType}&findKeyword=${findKeyword}"   <c:if test="${pageNum == i }">class='active'</c:if>     > ${i} </a>]
 						</c:forEach>
 					</c:if>
 					</td>
