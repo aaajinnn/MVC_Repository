@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace : 자바로치면 패키지 -->
+<mapper namespace="user.model.MemberMapper">
+	<!-- ==> mybatis-config.xml(설계도)의 mappers에 디렉토리 접근방식으로 설정해주어야함 -->
+	<!-- MemberDAOMyBatis에서 id를 찾아서 실행시킨다 -->
+	<select id="userCount" resultType="_int">
+		select count(*) from java_member
+	</select>
+
+	<!-- 회원가입 처리 #{프로퍼티명} ==> VO객체의 getName()을 호출 user.model.MemberVO => mybatis-config.xml에서 
+		별칭(typeAlias)등록함 ==> parameterType="Member" -->
+	<insert id="insertMember" parameterType="Member">
+		insert into java_member(name,id,pw,tel,indate)
+		values (#{name}, #{id}, #{pw}, #{tel:VARCHAR}, sysdate) <!--null값 허용은 JDBC타입으로 
+			기술 : #{tel:VARCHAR} -->
+	</insert>
+
+	<!-- 회원 목록 : select결과를 MemberVO에 자동으로 담아준다(setter메서드 이용) DB 테이블의 컬럼명과 VO객체의 
+		property명이 같아야 자동으로 담아준다. -->
+	<select id="listMember_old" resultType="Member">
+		<!-- resultType="" => list를 기술하는것이 아닌 list<MemberVO>의 멤버변수명인 Member을 기술함 -->
+		select * from java_member order by name asc
+	</select>
+
+	<select id="listMember" resultType="Member" parameterType="map">
+		<!--parameterType="map" : map인 파라미터를 불러오기 위함 -->
+		select * from
+		(select row_number() over(order by name asc) rn, java_member.* from
+		java_member
+		)where rn between #{start} and #{end}
+	</select>
+	
+	<delete id="deleteMember" parameterType="String">
+		delete from java_member where id=#{id}
+	</delete>
+
+</mapper>
