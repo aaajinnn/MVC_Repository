@@ -6,6 +6,7 @@
 <!-- namespace : 자바로치면 패키지 -->
 <mapper namespace="user.model.MemberMapper">
 	<!-- ==> mybatis-config.xml(설계도)의 mappers에 디렉토리 접근방식으로 설정해주어야함 -->
+	<!-- select는 resultType 필수 -->
 	<!-- MemberDAOMyBatis에서 id를 찾아서 실행시킨다 -->
 	<select id="userCount" resultType="_int">
 		select count(*) from java_member
@@ -15,9 +16,15 @@
 		별칭(typeAlias)등록함 ==> parameterType="Member" -->
 	<insert id="insertMember" parameterType="Member">
 		insert into java_member(name,id,pw,tel,indate)
-		values (#{name}, #{id}, #{pw}, #{tel:VARCHAR}, sysdate) <!--null값 허용은 JDBC타입으로 
-			기술 : #{tel:VARCHAR} -->
+		values (#{name}, #{id}, #{pw}, #{tel:VARCHAR}, sysdate) 
+		<!--null값 허용은 JDBC타입으로 기술 : #{tel:VARCHAR} -->
 	</insert>
+
+	<!-- 아이디 중복체크 -->
+	<select id="idCheck" resultType="_int" parameterType="string">
+		select count(id) from java_member
+		where id=#{value}
+	</select>
 
 	<!-- 회원 목록 : select결과를 MemberVO에 자동으로 담아준다(setter메서드 이용) DB 테이블의 컬럼명과 VO객체의 
 		property명이 같아야 자동으로 담아준다. -->
@@ -34,8 +41,32 @@
 		)where rn between #{start} and #{end}
 	</select>
 	
-	<delete id="deleteMember" parameterType="String">
-		delete from java_member where id=#{id}
+	<!-- 회원 삭제 -->
+	<!-- 파라미터가 1개일땐 #{value}라고 해도됨 -->
+	<delete id="deleteMember" parameterType="string">
+		delete from java_member 
+		<where>
+			id=#{id}
+		</where>		
 	</delete>
-
+	
+	<!-- id로 회원정보 가져오기 -->
+	<select id="getMember" resultType="Member" parameterType="string">
+		select * from java_member
+		<where>
+		id=#{value}
+		</where>
+	</select>
+	
+	<!-- 회원수정 -->
+	<update id="updateMember" parameterType="Member">
+		update java_member
+		<set>
+			name=#{name}, tel=#{tel:VARCHAR}
+		</set>
+		<where>
+			id=#{id}
+		</where>
+	</update>
+	
 </mapper>

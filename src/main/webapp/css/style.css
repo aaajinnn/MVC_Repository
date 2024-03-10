@@ -75,10 +75,14 @@ input,select,textarea,iframe,button{
 }
 
 #pageNavi{
+	display:flex;
+	flex-flow:row nowrap;
+	justify-content:center;
 	width:60%;
 	margin:auto;
 	text-align:center;
 	padding:3px;
+	margin-top:1em;
 }
 .pagination li{
 	float:left;

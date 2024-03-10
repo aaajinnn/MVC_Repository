@@ -91,6 +91,36 @@ public class MemberDAOMyBatis {
 		}
 	}// -----------------------------------
 
+	public MemberVO getMember(String id) {
+		try {
+			ses = this.getSessionFactory().openSession(true);
+			MemberVO user = ses.selectOne(NS + ".getMember", id);
+			return user;
+		} finally {
+			close();
+		}
+	}
+
+	public int updateMember(MemberVO user) {
+		try {
+			ses = this.getSessionFactory().openSession(true);
+			int n = ses.update(NS + ".updateMember", user);
+			return n;
+		} finally {
+			close();
+		}
+	}
+
+	public boolean idCheck(String id) {
+		try {
+			ses = this.getSessionFactory().openSession();
+			int cnt = ses.selectOne(NS + ".idCheck", id);
+			return (cnt == 1) ? false : true;
+		} finally {
+			close();
+		}
+	}
+
 	private void close() {
 		if (ses != null)
 			ses.close();
